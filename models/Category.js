@@ -8,7 +8,7 @@ const categorySchema = new mongoose.Schema({
     },
     parent:{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Category',
+        ref: 'Category', //parent reference to another category or Null for top-level categories
         default: null //Top-Level Categories
     },
     createdAt:{

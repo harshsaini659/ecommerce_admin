@@ -70,7 +70,11 @@ exports.login = async (req, res) => {
 exports.logout = (req,res) =>{
     try{
         res.clearCookie('token')
-        res.status(200).redirect('/auth/login')
+        res.status(200).json({
+            success: true,
+            message: "Logged out successfully"
+        })
+        // res.status(200).redirect('/auth/login')
     }catch(err){
         console.log("Logout Error:", err.message)
         res.status(500).send("Internal Server error")
