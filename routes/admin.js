@@ -11,6 +11,6 @@ router.get('/dashboard', isLoggedIn, (req,res)=>{
     })
 })
 
-router.use('/category', categoryRoute)
+router.use('/category', isLoggedIn, categoryRoute)
 
 module.exports = router
