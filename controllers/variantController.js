@@ -52,3 +52,92 @@ exports.listVariant = async (req,res)=>{
         res.status(500).send("Internal Server Error")
     }
 }
+
+// Update a variant by ID
+exports.updateVariant = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, values } = req.body;
+        
+        // Validate input
+        if (!name || !values || !Array.isArray(values) || values.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Variant name and values[] are required"
+            });
+        }
+        
+        // Check if variant exists
+        const variant = await Variant.findById(id);
+        if (!variant) {
+            return res.status(404).json({
+                success: false,
+                message: "Variant not found"
+            });
+        }
+        
+        // Check if another variant with the same name exists (excluding current variant)
+        const existingVariant = await Variant.findOne({ 
+            name: name.trim(),
+            _id: { $ne: id } // Exclude current variant
+        });
+        
+        if (existingVariant) {
+            return res.status(400).json({
+                success: false,
+                message: "Another variant with this name already exists"
+            });
+        }
+        
+        // Update variant
+        const updatedVariant = await Variant.findByIdAndUpdate(
+            id, 
+            { name, values }, 
+            { new: true } // Return updated document
+        );
+        
+        res.status(200).json({
+            success: true,
+            message: "Variant updated successfully",
+            data: updatedVariant
+        });
+        
+    } catch (err) {
+        console.error("Update Variant Error:", err.message);
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        });
+    }
+}
+
+// Delete a variant by ID
+exports.deleteVariant = async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        // Check if variant exists
+        const variant = await Variant.findById(id);
+        if (!variant) {
+            return res.status(404).json({
+                success: false,
+                message: "Variant not found"
+            });
+        }
+        
+        // Delete variant
+        await Variant.findByIdAndDelete(id);
+        
+        res.status(200).json({
+            success: true,
+            message: "Variant deleted successfully"
+        });
+        
+    } catch (err) {
+        console.error("Delete Variant Error:", err.message);
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        });
+    }
+}
